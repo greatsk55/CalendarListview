@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
@@ -84,6 +85,8 @@ class SimpleMonthView extends View
     protected int mDayNumColor;
     protected int mMonthTitleBGColor;
     protected int mPreviousDayColor;
+    protected int mPreviousHolidayColor;
+    protected int mHolidayColor;
     protected int mSelectedDaysColor;
 
     private final StringBuilder mStringBuilder;
@@ -133,7 +136,9 @@ class SimpleMonthView extends View
         mMonthTextColor = typedArray.getColor(R.styleable.DayPickerView_colorMonthName, resources.getColor(R.color.normal_day));
         mDayTextColor = typedArray.getColor(R.styleable.DayPickerView_colorDayName, resources.getColor(R.color.normal_day));
         mDayNumColor = typedArray.getColor(R.styleable.DayPickerView_colorNormalDay, resources.getColor(R.color.normal_day));
-        mPreviousDayColor = typedArray.getColor(R.styleable.DayPickerView_colorPreviousDay, resources.getColor(R.color.normal_day));
+        mPreviousDayColor = typedArray.getColor(R.styleable.DayPickerView_colorPreviousDay, resources.getColor(R.color.previous_day));
+        mPreviousHolidayColor = typedArray.getColor(R.styleable.DayPickerView_colorPreviousHoliday, resources.getColor(R.color.previous_holiday));
+        mHolidayColor = typedArray.getColor(R.styleable.DayPickerView_colorHoliday, resources.getColor(R.color.holiday));
         mSelectedDaysColor = typedArray.getColor(R.styleable.DayPickerView_colorSelectedDayBackground, resources.getColor(R.color.selected_day_background));
         mMonthTitleBGColor = typedArray.getColor(R.styleable.DayPickerView_colorSelectedDayText, resources.getColor(R.color.selected_day_text));
 
@@ -208,6 +213,13 @@ class SimpleMonthView extends View
         return ((mYear < time.year)) || (mYear == time.year && mMonth < time.month) || ( mMonth == time.month && monthDay < time.monthDay);
     }
 
+    private boolean holiday(int monthDay){
+        String m = (mMonth>9) ? String.valueOf(mMonth) : String.valueOf("0"+mMonth);
+        String d = (monthDay>9) ? String.valueOf(monthDay) : String.valueOf("0"+monthDay);
+
+        return Helper_calendar.isHoliday(""+mYear+m+d);
+    }
+
 	protected void drawMonthNums(Canvas canvas) {
 		int y = (mRowHeight + MINI_DAY_NUMBER_TEXT_SIZE) / 2 - DAY_SEPARATOR_WIDTH + MONTH_HEADER_SIZE;
 		int paddingDay = (mWidth - 2 * mPadding) / (2 * mNumDays);
@@ -273,9 +285,14 @@ class SimpleMonthView extends View
                 mMonthNumPaint.setColor(mSelectedDaysColor);
             }
 
+            if(holiday(day)){
+                mMonthNumPaint.setColor(mHolidayColor);
+            }
+
             if (!isPrevDayEnabled && prevDay(day, today) && today.month == mMonth && today.year == mYear)
             {
                 mMonthNumPaint.setColor(mPreviousDayColor);
+                if(holiday(day)) mMonthNumPaint.setColor(mPreviousHolidayColor);
                 mMonthNumPaint.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
             }
 

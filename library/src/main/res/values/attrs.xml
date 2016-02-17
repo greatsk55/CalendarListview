@@ -5,6 +5,8 @@
         <attr name="colorSelectedDayBackground" format="color"/>
         <attr name="colorSelectedDayText" format="color"/>
         <attr name="colorPreviousDay" format="color"/>
+        <attr name="colorPreviousHoliday" format="color"/>
+        <attr name="colorHoliday" format="color"/>
         <attr name="colorNormalDay" format="color" />
         <attr name="colorMonthName" format="color" />
         <attr name="colorDayName" format="color" />
