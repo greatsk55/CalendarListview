@@ -1,8 +1,5 @@
 package com.andexert.calendarlistview.library;
 
-import java.util.Calendar;
-
-
 import com.ibm.icu.util.ChineseCalendar;
 
 import java.text.ParseException;
@@ -94,6 +91,57 @@ public class Helper_calendar {
         }
         return day ;
     }
+
+    public static int getDateNumDay(String date){
+        String day = "" ;
+
+        Calendar cal = Calendar.getInstance() ;
+        cal.set(Integer.parseInt(date.substring(0, 4)), Integer.parseInt(date.substring(4, 6)) - 1, Integer.parseInt(date.substring(6, 8)));
+
+        int dayNum = cal.get(Calendar.DAY_OF_WEEK) ;
+        //1 = SUN
+        //2 = MON;
+        //3 = TUE;
+        //4 = WED;
+        //5 = THU;
+        //6 = FRI;
+        //7 = SAT;
+        return dayNum ;
+    }
+
+    private static boolean holiday(String yyyymmdd){
+        int yyyy = Integer.parseInt(yyyymmdd.substring(0, 4));
+        int isYun = chkYun(yyyy);  //윤년체크
+        try {
+            // 음력 공휴일을 양력으로 바꾸어서 입력
+            String tmp03 = fromLunar( yyyy + "0408");// 석가탄신일
+
+            String[] holidays = {
+                    tmp03,
+                    yyyy + "0101",  // 양력설날
+                    yyyy + "0301",  // 삼일절
+                    yyyy + "0405",  // 식목일
+                    yyyy + "0606",  // hynchoong ill
+                    yyyy + "0815",  // 광복절
+                    yyyy + "1003",  // 개천절
+                    yyyy + "1009",  // 한글날
+                    yyyy + "1225",  // 성탄절
+            };
+
+            for ( int ii = 0 ; ii < holidays.length ; ++ii ) {
+                if ( yyyymmdd.equals(holidays[ii])  ) {
+                    return true ;
+                }
+            }
+            if( getDateDay(yyyymmdd).equals("SUN") )    //일요일만 공휴일로 인정.
+                return true;
+
+        } catch(Exception ex) {
+            throw ex;
+        }
+        return false;
+    }
+
     //GET HOLIDAY
     public static boolean isHoliday(String yyyymmdd){
         // 검사년도
@@ -128,12 +176,104 @@ public class Helper_calendar {
             if( getDateDay(yyyymmdd).equals("SUN") || getDateDay(yyyymmdd).equals("SAT") )
                 return true;
 
+            if( holiday(yyyy+preDays(tmp01))  || holiday(yyyy + afterDays(tmp01)) || holiday(tmp01) ){
+                String tmp = yyyy+afterDays(tmp01);
+                do{
+                    tmp = yyyy+afterDays(tmp);
+                }while( holiday(tmp));
+
+                if( yyyymmdd.equals(tmp) ) return true;
+            }
+
+            if( holiday(yyyy+preDays(tmp02))  || holiday(yyyy+afterDays(tmp02)) || holiday(tmp02) ){
+                String tmp = yyyy+afterDays(tmp02);
+                do{
+                    tmp = yyyy+afterDays(tmp);
+                }while( holiday(tmp));
+
+                if( yyyymmdd.equals(tmp) ) return true;
+            }
+
+            if( getDateNumDay(yyyy + "0505") == 7 || holiday(yyyy + "0505") ){
+                String tmp = yyyy+"0505";
+                do{
+                    tmp = yyyy+afterDays(tmp);
+                }while( holiday(tmp));
+                if( yyyymmdd.equals(tmp)) return true;
+            }
+
         } catch(Exception ex) {
             throw ex;
         }
         return false;
     }
 
+    //for finding saturday
+    public static boolean findSatday(String yyyymmdd){
+        // 검사년도
+        int yyyy = Integer.parseInt(yyyymmdd.substring(0, 4));
+        int isYun = chkYun(yyyy);  //윤년체크
+        try {
+            // 음력 공휴일을 양력으로 바꾸어서 입력
+            String tmp01 = fromLunar(yyyy + "0101");// 음력설날
+            String tmp02 = fromLunar(yyyy + "0815");// 음력추석
+            String tmp03 = fromLunar( yyyy + "0408");// 석가탄신일
+
+            String[] holidays = {
+                    yyyy+preDays(tmp01), tmp01,yyyy+afterDays(tmp01), //설날전날,설날,설날다음날
+                    yyyy+preDays(tmp02), tmp02,yyyy+afterDays(tmp02),  //추석전날,추석,추석다음날
+                    tmp03,
+                    yyyy + "0101",  // 양력설날
+                    yyyy + "0301",  // 삼일절
+                    yyyy + "0405",  // 식목일
+                    yyyy + "0505",  // 어린이날
+                    yyyy + "0606",  // hynchoong ill
+                    yyyy + "0815",  // 광복절
+                    yyyy + "1003",  // 개천절
+                    yyyy + "1009",  // 한글날
+                    yyyy + "1225",  // 성탄절
+            };
+
+            for ( int ii = 0 ; ii < holidays.length ; ++ii ) {
+                if ( yyyymmdd.equals(holidays[ii])  ) {
+                    return true ;
+                }
+            }
+            if( getDateDay(yyyymmdd).equals("SUN") )
+                return true;
+
+            if( holiday(yyyy+preDays(tmp01))  || holiday(yyyy + afterDays(tmp01)) || holiday(tmp01) ){
+                String tmp = yyyy+afterDays(tmp01);
+                do{
+                    tmp = yyyy+afterDays(tmp);
+                }while( holiday(tmp));
+
+                if( yyyymmdd.equals(tmp) ) return true;
+            }
+
+            if( holiday(yyyy+preDays(tmp02))  || holiday(yyyy+afterDays(tmp02)) || holiday(tmp02) ){
+                String tmp = yyyy+afterDays(tmp02);
+                do{
+                    tmp = yyyy+afterDays(tmp);
+                }while( holiday(tmp));
+
+                if( yyyymmdd.equals(tmp) ) return true;
+            }
+
+            if( getDateNumDay(yyyy + "0505") == 7 || holiday(yyyy + "0505") ){
+                String tmp = yyyy+"0505";
+                do{
+                    tmp = yyyy+afterDays(tmp);
+                }while( holiday(tmp));
+                if( yyyymmdd.equals(tmp)) return true;
+            }
+
+        } catch(Exception ex) {
+            throw ex;
+        }
+        return false;
+
+    }
 
     public static String fromLunar(String yyyymmdd) {
         cal = Calendar.getInstance();

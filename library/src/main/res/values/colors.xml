@@ -2,6 +2,7 @@
 <resources>
     <color name="previous_holiday">#ff7e5f</color>
     <color name="holiday">#ffff0000</color>
+    <color name="satday">#3449ff</color>
     <color name="previous_day">#ff989793</color>
     <color name="normal_day">#ff999999</color>
     <color name="selected_day_background">#E75F49</color>
